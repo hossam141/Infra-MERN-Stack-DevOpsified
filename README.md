@@ -1,6 +1,9 @@
-# 🧱 Infrastructure Provisioning: EKS DevOps Pipeline
+# 🧱 Infrastructure Provisioning: Infra-MERN-Stack-DevOpsified
 
 This documentation outlines the complete infrastructure provisioning steps for setting up a robust DevOps pipeline using Jenkins, Terraform, EKS, and Argo CD. It includes EC2 setup, EKS provisioning, Load Balancer Controller setup, and Argo CD deployment.
+
+
+![Infra-MERN-Stack-DevOpsified](infra_mearn.gif)
 
 ---
 
