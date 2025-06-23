@@ -1,19 +1,22 @@
-# 🚀 Step 1: Provision EC2 Instance with DevOps Toolchain
+# DevOps EC2 Toolchain Setup
 
-## 🖥️ EC2 Instance Setup
+## 🚀 Step 1: Provision EC2 Instance with DevOps Toolchain
 
-- **Operating System**: Ubuntu 22.04
-- **Instance Type**: t3.medium or higher recommended
-- **Storage**: 30 GB GP2 (minimum)
-- **Security Group**: Open ports 22 (SSH), 8080 (Jenkins), 9000 (SonarQube), 80/443 (as needed)
-- **IAM Role (Instance Profile)**: Attach an IAM role with the following policies:
-  - `AmazonEC2FullAccess`
-  - `AmazonEKSClusterPolicy`
-  - `AmazonEKSWorkerNodePolicy`
-  - `AmazonECRFullAccess`
-  - `AmazonS3FullAccess`
-  - `CloudWatchAgentServerPolicy`
-  - `IAMFullAccess` *(optional / can use least privilege)*
+### 🖥️ EC2 Instance Setup
+
+* **Operating System**: Ubuntu 22.04
+* **Instance Type**: t3.medium or higher recommended
+* **Storage**: 30 GB GP2 (minimum)
+* **Security Group**: Open ports 22 (SSH), 8080 (Jenkins), 9000 (SonarQube), 80/443 (as needed)
+* **IAM Role (Instance Profile)**: Attach an IAM role with the following policies:
+
+  * `AmazonEC2FullAccess`
+  * `AmazonEKSClusterPolicy`
+  * `AmazonEKSWorkerNodePolicy`
+  * `AmazonECRFullAccess`
+  * `AmazonS3FullAccess`
+  * `CloudWatchAgentServerPolicy`
+  * `IAMFullAccess` *(optional / can use least privilege)*
 
 ### 👇 User Data Script
 
@@ -81,163 +84,158 @@ sudo apt install trivy -y
 
 # Helm Installation
 sudo snap install helm --classic
+```
 
 ---
 
-# ⚙️ Step 2: Jenkins Plugins Setup for AWS & Terraform Integration
+## ⚙️ Step 2: Jenkins Plugins Setup for AWS & Terraform Integration
 
-## ✅ Plugins Installed
+### ✅ Plugins Installed
 
-### 1. **AWS Credentials Plugin**
-- **Name**: `AWS Credentials`
-- **Purpose**: 
-  - Stores IAM Access Key ID & Secret Access Key in Jenkins Credentials store.
-  - Supports MFA tokens and IAM Roles (advanced use).
+#### 1. **AWS Credentials Plugin**
 
-### 2. **Pipeline: AWS Steps Plugin**
-- **Name**: `Pipeline: AWS Steps`
-- **Purpose**: 
-  - Adds pipeline support to interact with AWS API using scripted or declarative pipelines.
+* **Name**: `AWS Credentials`
+* **Purpose**:
 
-### 3. **Terraform Plugin**
-- **Name**: `Terraform`
-- **Purpose**: 
-  - Allows you to run `terraform init`, `plan`, `apply`, etc., as Jenkins build steps.
-  - Useful for IAC pipelines.
+  * Stores IAM Access Key ID & Secret Access Key in Jenkins Credentials store.
+  * Supports MFA tokens and IAM Roles (advanced use).
 
----
+#### 2. **Pipeline: AWS Steps Plugin**
 
-## 🔐 Jenkins Credentials Setup for AWS
+* **Name**: `Pipeline: AWS Steps`
+* **Purpose**:
 
-- **Navigate to**: `Manage Jenkins > Credentials > Global > Add Credentials`
-- **Kind**: `AWS Credentials`
-- **ID**: `aws-creds` *(use this ID in pipeline scripts)*
-- **Access Key ID**: `<Your AWS Access Key>`
-- **Secret Access Key**: `<Your AWS Secret Key>`
-- **Scope**: `Global`
+  * Adds pipeline support to interact with AWS API using scripted or declarative pipelines.
+
+#### 3. **Terraform Plugin**
+
+* **Name**: `Terraform`
+* **Purpose**:
+
+  * Allows you to run `terraform init`, `plan`, `apply`, etc., as Jenkins build steps.
+  * Useful for IAC pipelines.
 
 ---
 
-## 🧰 Terraform Configuration in Jenkins
+### 🔐 Jenkins Credentials Setup for AWS
 
-- **Navigate to**: `Manage Jenkins > Global Tool Configuration`
-- Under **Terraform installations**:
-  - Click `Add Terraform`
-  - **Name**: `terraform`
-  - **Install Directory**: `/usr/bin/terraform` *(already installed in EC2)*
-  - **Install Automatically**: (Leave unchecked)
+* **Navigate to**: `Manage Jenkins > Credentials > Global > Add Credentials`
+* **Kind**: `AWS Credentials`
+* **ID**: `aws-creds` *(use this ID in pipeline scripts)*
+* **Access Key ID**: `<Your AWS Access Key>`
+* **Secret Access Key**: `<Your AWS Secret Key>`
+* **Scope**: `Global`
 
+---
+
+### 🧰 Terraform Configuration in Jenkins
+
+* **Navigate to**: `Manage Jenkins > Global Tool Configuration`
+* Under **Terraform installations**:
+
+  * Click `Add Terraform`
+  * **Name**: `terraform`
+  * **Install Directory**: `/usr/bin/terraform` *(already installed in EC2)*
+  * **Install Automatically**: (Leave unchecked)
+
+---
 
 
 # 🛠️ Step 3: Provisioning EKS Cluster using Jenkins + Terraform
 
-In this step, we built an automated Jenkins pipeline to provision an **Amazon EKS Cluster** using **Terraform** code stored in GitHub. Below is the detailed and descriptive documentation of what was done, suitable for publishing in a professional portfolio or GitHub repository.
+We automated EKS provisioning using a Jenkins pipeline and Terraform code hosted on GitHub.
 
 ---
 
 ## 📁 Folder Structure
 
-Our infrastructure code is organized as follows:
-
 ```
 eks/
-├── backend.tf             # Remote backend configuration (e.g., S3 + DynamoDB)
-├── dev.tfvars             # Environment-specific variables for 'dev'
-├── main.tf                # Main Terraform configuration file calling modules
+├── backend.tf             # Remote backend config (S3 + DynamoDB)
+├── dev.tfvars             # Environment-specific variables
+├── main.tf                # Main Terraform config
 ├── variables.tf           # Variable declarations
 ├── .terraform.lock.hcl    # Provider lock file
 
 module/
 ├── eks.tf                 # EKS cluster definition
 ├── vpc.tf                 # VPC setup
-├── iam.tf                 # IAM roles and policies
-├── gather.tf              # Data sources or outputs
-├── variables.tf           # Module-specific variables
+├── iam.tf                 # IAM roles & policies
+├── gather.tf              # Data sources/outputs
+├── variables.tf           # Module variables
 ```
 
 ---
 
-## 🧩 Jenkins Pipeline Setup (Declarative Pipeline)
+## 🧩 Jenkins Pipeline Setup
 
-We created a new Jenkins pipeline job named `Infrastructure-Job`.
+**Job Name**: `Infrastructure-Job`
 
-**Steps to Create the Pipeline Job:**
-- Navigate to **Jenkins Dashboard > New Item**.
-- Enter name: `Infrastructure-Job`.
-- Choose project type: **Pipeline**.
-- Click OK.
-
----
-
-## 🧾 Jenkinsfile Logic
-
-A declarative pipeline was written directly in the Jenkins UI under **Pipeline > Script** section. Here's what each stage does:
-
-### 🔧 Parameters Setup
-
-- `Environment`: String parameter with default value `dev`.
-- `Terraform_Action`: Choice parameter with options `plan`, `apply`, `destroy`.
-
-### 🚀 Pipeline Stages Breakdown
-
-1. **Preparing**: Basic echo to mark the start of the pipeline.
-   ```sh
-   echo Preparing
-   ```
-
-2. **Git Pulling**: Clone the GitHub repository that holds the Terraform code.
-   ```groovy
-   git branch: 'master', url: 'https://github.com/AmanPathak-DevOps/EKS-Terraform-GitHub-Actions.git'
-   ```
-
-3. **Init**: Initialize Terraform in the `eks/` directory using AWS credentials from Jenkins.
-   ```sh
-   terraform -chdir=eks/ init
-   ```
-
-4. **Validate**: Validate the Terraform configuration.
-   ```sh
-   terraform -chdir=eks/ validate
-   ```
-
-5. **Action (plan/apply/destroy)**:
-   Dynamically runs one of the following based on the chosen `Terraform_Action` parameter:
-   - `plan`: Shows the resources to be created
-   - `apply`: Provisions the infrastructure on AWS
-   - `destroy`: Tears down the infrastructure
-
-   ```sh
-   terraform -chdir=eks/ plan -var-file=dev.tfvars
-   terraform -chdir=eks/ apply -var-file=dev.tfvars -auto-approve
-   terraform -chdir=eks/ destroy -var-file=dev.tfvars -auto-approve
-   ```
+**Steps:**
+1. Go to `Jenkins Dashboard > New Item`
+2. Enter: `Infrastructure-Job`
+3. Choose: **Pipeline**
+4. Click OK
 
 ---
 
-## ✅ Pipeline Execution Summary
+## 🧾 Jenkinsfile Logic (Declarative Pipeline)
 
-- The job was executed successfully with `Terraform_Action = plan`.
-- Jenkins cloned the repo, initialized the configuration, validated it, and ran the plan.
-- The Terraform plan showed `38 to add, 0 to change, 0 to destroy` — indicating new infrastructure ready to be provisioned.
-- On choosing `apply`, the resources (including VPC, EKS, IAM roles) were deployed to AWS.
+### 🔧 Parameters
+```groovy
+Environment: 'dev'
+Terraform_Action: ['plan', 'apply', 'destroy']
+```
+
+### 🚀 Pipeline Stages
+
+#### 1. Preparing
+```sh
+echo Preparing
+```
+
+#### 2. Git Pulling
+```groovy
+git branch: 'master', url: 'https://github.com/AmanPathak-DevOps/EKS-Terraform-GitHub-Actions.git'
+```
+
+#### 3. Init
+```sh
+terraform -chdir=eks/ init
+```
+
+#### 4. Validate
+```sh
+terraform -chdir=eks/ validate
+```
+
+#### 5. Plan/Apply/Destroy
+```sh
+terraform -chdir=eks/ plan -var-file=dev.tfvars
+terraform -chdir=eks/ apply -var-file=dev.tfvars -auto-approve
+terraform -chdir=eks/ destroy -var-file=dev.tfvars -auto-approve
+```
 
 ---
 
-## 🔐 Credentials & Plugins
+## ✅ Execution Summary
 
-- **AWS Credentials**: Configured in Jenkins using ID `aws-creds`.
-- **Installed Plugins**:
+- Successfully cloned the repo.
+- Initialized and validated Terraform.
+- Plan: `38 to add, 0 to change, 0 to destroy`.
+- Apply: VPC, EKS cluster, IAM roles created.
+
+---
+
+## 🔐 Credentials & Plugins Recap
+
+- AWS Credentials in Jenkins ID: `aws-creds`
+- Plugins:
   - Pipeline
   - Pipeline: Stage View
-  - Docker Pipeline (optional for future steps)
+  - Docker Pipeline (optional)
 
 ---
-
-## 📌 Conclusion
-
-This step sets up a fully working CI pipeline to manage infrastructure as code (IaC) for EKS. By integrating Jenkins with Terraform, we can control deployments through parameters and automate cloud provisioning with high visibility.
-
-This is an essential building block in our end-to-end DevOps pipeline for a MERN application.
 
 
 # 🛡️ Step 4: Create & Configure Jump Server in EKS VPC
@@ -288,8 +286,6 @@ kubectl get nodes
 ```
 
 We successfully listed the worker nodes, which confirms the jump server can interact with the EKS cluster.
-
-
 
 # ⚙️ Step 5: Deploying AWS Load Balancer Controller in EKS
 
@@ -365,7 +361,6 @@ You should see the controller running with READY status (e.g., 2/2 pods availabl
 ---
 
 This completes the setup of the AWS Load Balancer Controller in our EKS environment. This controller is now capable of managing ALBs for Kubernetes ingress resources based on your application deployments.
-
 
 # 🚀 Step 6: Argo CD Deployment on Amazon EKS
 
@@ -481,3 +476,5 @@ You should see the Argo CD dashboard.
 ---
 
 ✅ You have now successfully deployed and accessed Argo CD on Amazon EKS!
+
+
