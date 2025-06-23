@@ -31,6 +31,7 @@ Install all DevOps tools on boot (Jenkins, Docker, SonarQube, AWS CLI, kubectl, 
 
 ---
 
+
 ## ⚙️ Step 2: Jenkins Plugins Setup
 
 Install these Jenkins plugins:
