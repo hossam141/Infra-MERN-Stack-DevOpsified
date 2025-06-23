@@ -82,7 +82,7 @@ sudo apt install trivy -y
 # Helm Installation
 sudo snap install helm --classic
 
-
+---
 
 # ⚙️ Step 2: Jenkins Plugins Setup for AWS & Terraform Integration
 

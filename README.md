@@ -46,7 +46,7 @@ Configure Terraform tool under Jenkins > Global Tool Configuration.
 
 ---
 
-## 🛠️ Step 4: Provisioning EKS with Jenkins + Terraform
+## 🛠️ Step 3: Provisioning EKS with Jenkins + Terraform
 
 ### 📁 Terraform Folder Structure
 
@@ -82,7 +82,7 @@ Create a pipeline named `Infrastructure-Job` with parameters:
 
 ---
 
-## 🛡️ Step 5: Create & Configure Jump Server
+## 🛡️ Step 4: Create & Configure Jump Server
 
 * Launch EC2 in EKS VPC (public subnet)
 * AMI: Ubuntu 22.04
@@ -108,7 +108,7 @@ kubectl get nodes
 
 ---
 
-## ⚙️ Step 6: Deploy AWS Load Balancer Controller
+## ⚙️ Step 5: Deploy AWS Load Balancer Controller
 
 ### Create IAM Policy & Service Account:
 
@@ -147,7 +147,7 @@ kubectl get deployment -n kube-system aws-load-balancer-controller
 
 ---
 
-## 🚀 Step 7: Deploy Argo CD on Amazon EKS
+## 🚀 Step 6: Deploy Argo CD on Amazon EKS
 
 ### 1. Create Namespace:
 
